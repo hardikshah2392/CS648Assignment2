@@ -12,7 +12,7 @@ class ProductRow extends React.Component{
         <td>{prod.name}</td>
         <td>${prod.price}</td>
         <td>{prod.category}</td>
-        <td><a href = {`//${prod.url}`} target = "__blank">View</a></td>
+        <td><a href = {prod.url} target = "__blank">View</a></td>        
       </tr>
     )
   }
@@ -55,7 +55,6 @@ class ProductAdd extends React.Component {
       category:form.category.value,
       url:form.url.value
     });
-    console.log(form.price.value);
     form.name.value = '',form.price.value = "$", form.category.value = "", form.url.value= ""
   }
   render() {
