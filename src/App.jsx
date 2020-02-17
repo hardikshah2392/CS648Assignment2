@@ -1,136 +1,124 @@
 var contentNode = document.getElementById('contents');
 
-const reset_values = {name: '', price: '$', category: 'Shirts', image: ''}
+const prods = []
 
 
 
-class ProdRow extends React.Component {
-  constructor(props) {
-    super(props)
-  }
+class ProductRow extends React.Component{
   render() {
-    return (
+    const prod = this.props.prod;
+    return(
       <tr>
-        <td> {this.props.prod.name} </td>
-        <td> ${this.props.prod.price} </td>
-        <td> {this.props.prod.category} </td>
-        <td> <a href = {this.props.prod.image} target="__blank"> View </a> </td>
+        <td>{prod.name}</td>
+        <td>${prod.price}</td>
+        <td>{prod.category}</td>
+        <td><a href = {`//${prod.url}`} target = "__blank">View</a></td>
       </tr>
     )
   }
 }
 
-class ProdTable extends React.Component {
-  constructor(props) {
-    super(props)
-  }
-  render() {
-    const prodlist = Object.keys(this.props.prods).map((id) => {
-      const prodInfo = this.props.prods[id] || {};
-      return <ProdRow key={id} prod={prodInfo}/>
-    })
+class ProductTable extends React.Component {
+  render () {
+    const prodrows = this.props.prods.map(prod => <ProductRow key ={prod.id} prod={prod}/>);
     return (
-      <table>
+      <table style={{borderCollapse: "collapse"}}>
         <thead>
           <tr>
-            <th> Product Name </th>
-            <th> Price </th>
-            <th> Category </th>
-            <th> Image </th>
+          <th>Product Name</th>
+          <th>Price</th>
+          <th>Category</th>
+          <th>Image</th>
           </tr>
         </thead>
         <tbody>
-          {prodlist}
+          {prodrows}
         </tbody>
       </table>
     )
   }
 }
 
-class ProdForm extends React.Component {
-  constructor(props) {
-    super(props)
-      this.handleChange = this.handleChange.bind(this)
-      this.handleSave = this.handleSave.bind(this)
-      this.state = {
-          prod: this.props.formInput || Object.assign({}, reset_values),
-          errors: {}
-    }
+
+class ProductAdd extends React.Component {
+  constructor(){
+    super();
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleChange(e) {
-    const target = e.target
-    const value = target.value
-    const name = target.name
-    this.setState((prevState) => {
-        prevState.prod[name] = value
-        return { prod: prevState.prod }
-    })
-  }
-
-  handleSave(e) {
+  handleSubmit(e) {
     e.preventDefault();
-    this.props.onSave(this.state.prod);
-    
-    this.setState({
-        prod: Object.assign({}, reset_values), 
-        errors: {}
-    })
-  }
-
-  render () {
-    return (
-        <form>
-            <label>Category</label>
-            <label>Price Per Unit </label>
-            <select name="category" onChange={this.handleChange}>
-              <option value="Shirts">Shirts</option>
-              <option value="Jeans">Jeans</option>
-              <option value="Jackets">Jackets</option>
-              <option value="Sweaters">Sweaters</option>
-              <option value="Accessories">Accessories</option>
-            </select>
-            <input type="text" name="price" onChange={this.handleChange} value={this.state.prod.price} />
-            <label>Product Name </label>
-            <label>Image URL </label>
-            <input type="text" name="name" onChange={this.handleChange} value={this.state.prod.name} />
-            <input type="text" name="image" onChange={this.handleChange} value={this.state.prod.image} />
-            <div id='btn'><input type="submit" value="Add Product" onClick={this.handleSave}></input></div>
-        </form>
-    )
-  }
-}
-class ProdList extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-        prods: {
-      },
-      formData: null
-    }
-    this.handleSave = this.handleSave.bind(this)
-  }
-  handleSave(prod) {
-    prod['price'] = prod['price'].substring(1)
-    this.setState((prevState) => {
-      let prods = prevState.prods
-      prods[Math.floor((Math.random() * 1000000) + 1)] = prod
-      return { prods }
-    })
+    var form = document.forms.prodAdd;
+    this.props.createProd({
+      name: form.name.value,
+      price:form.price.value.replace("$",""),
+      category:form.category.value,
+      url:form.url.value
+    });
+    console.log(form.price.value);
+    form.name.value = '',form.price.value = "$", form.category.value = "", form.url.value= ""
   }
   render() {
     return (
       <div>
-        <h1>My Company Inventory</h1>
-        <h2>Showing all available products. <hr/></h2>
-      <ProdTable prods={this.state.prods}/>
-      <h3> Add a new product to inventory </h3>
-      <hr/>
-      <ProdForm formInput={this.state.formData} onSave={this.handleSave}/>
+        <br/>
+        <h2>Add a Product</h2>
+        <form name="prodAdd" onSubmit={this.handleSubmit}>
+        <lable>Category</lable>
+        <label>Name</label>
+          <select name="category">
+               <option value="Shirts">Shirts</option>
+               <option value="Jeans">Jeans</option>
+               <option value="Jackets">Jackets</option>
+               <option value="Sweaters">Sweaters</option>
+               <option value="Accessories">Accessories</option>
+          </select>
+          <input type="text" name="name"/>
+          <lable>Price</lable>
+          <lable>Image</lable>
+          <input type="text" name="price"/>
+          <input type="text" name="url"/>
+          <button>Add</button>
+        </form>
       </div>
     )
   }
 }
 
 
-ReactDOM.render(<ProdList />, contentNode);
+class ProductList extends React.Component {
+  constructor (){
+    super();
+    this.state = {prods:prods};
+    // this.createTestProd = this.createProd.bind(this);
+    this.createProd = this.createProd.bind(this);
+    // setTimeout(this.createTestProd.bind(this),2000);
+  }
+
+  createProd(newProd) {
+    const newProds = this.state.prods.slice();
+    newProd.id = this.state.prods.length + 1;
+    newProds.push(newProd);
+    console.log({newProds})
+    this.setState({prods:newProds})
+  }
+
+  // createTestProd(){
+  //   this.createProd({
+  //     name:"Deepesh", price:20,category:"Accesories",url:"wikipedia.com"
+  //   });
+  // }
+  render(){
+  return (
+    <div>
+      <h1>My Company Inventory</h1><br/>
+      <h2>Showing all available products<hr/></h2>
+      <ProductTable prods = {this.state.prods}/>
+      <ProductAdd createProd = {this.createProd}/>
+    </div>
+  )
+  }
+}
+
+
+ReactDOM.render(<ProductList />, contentNode);

@@ -12,27 +12,18 @@ text-align: left;
 }
 
 form {
-display: grid;
-grid-template-columns: 500px 500px;
-column-gap: 10px;
-row-gap: 10px;
-margin-top: 20px;
-font-weight: bold;
+    display: grid;
+    grid-template-columns: 500px 500px;
+    column-gap: 10px;
+    row-gap: 10px;
+    margin-top: 20px;
+    font-weight: bold;
 }
 
 form > input, select {
 width: 200px;
 }
 
-input[type=submit] {
-height: auto;
-width: auto;
-border: none;
-padding: 10px;
-cursor: pointer;
-background-color: silver;
-text-align: center;
-}
-#btn {
-margin-top: 20px;
+button {
+    width: 100px;
 }
